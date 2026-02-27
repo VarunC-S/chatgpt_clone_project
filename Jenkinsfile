@@ -9,7 +9,7 @@ pipeline{
     stages {
         stage ('checkout')
         steps{
-            branch: 'main',
+            git branch: 'main',
             url : 'https://github.com/VarunC-S/chatgpt_clone_project.git'
         }
         stage ('build a docker image')

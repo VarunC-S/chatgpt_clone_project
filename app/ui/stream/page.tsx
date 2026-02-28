@@ -38,6 +38,7 @@ export default function StreamPage() {
     };
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-zinc-900 py-12">
+        <p> cicd automation testing</p>
             <p className="text-red-500 font-bold mb-2">C/CD Automation Test Successful</p>
             <div className="w-full max-w-2xl mx-4">
                 <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-md overflow-hidden">

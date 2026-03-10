@@ -6,32 +6,52 @@ pipeline{
         PORT = '3000'
     }
 
+    tools {
+        sonarScanner 'sonar-scanner'
+    }
+
     stages {
-        stage( 'Checkout' ){
-            steps {
+
+        stage('Checkout'){
+            steps{
                 git branch: 'main',
                 url: 'https://github.com/ytmicrodegreeprojects/chatgpt_clone.git'
             }
         }
 
-        stage( 'Build Docker Image' ) {
-            steps {
-                sh 'docker build -t  chatgpt_clone .'
+        stage('SonarQube Analysis'){
+            steps{
+                withSonarQubeEnv('sonar-server'){
+                    sh '''
+                    sonar-scanner \
+                    -Dsonar.projectKey=chatgpt_clone \
+                    -Dsonar.projectName=chatgpt_clone \
+                    -Dsonar.sources=. \
+                    -Dsonar.host.url=http://localhost:9000 \
+                    -Dsonar.login=$SONAR_AUTH_TOKEN
+                    '''
+                }
             }
         }
 
-        stage( 'Deploy App' ) {
-            steps {
-                script {
+        stage('Build Docker Image'){
+            steps{
+                sh 'docker build -t chatgpt_clone .'
+            }
+        }
+
+        stage('Deploy App'){
+            steps{
+                script{
                     sh """
-                        docker stop chatgpt-clone-container || true
-                        docker rm chatgpt-clone-container || true
-                        docker run -d \
-                            --name chatgpt-clone-container \
-                            -p 3000:3000 \
-                            -e OPENAI_API_KEY='${OPENAI_API_KEY}' \
-                            -e PORT='${PORT}' \
-                            chatgpt_clone 
+                    docker stop chatgpt-clone-container || true
+                    docker rm chatgpt-clone-container || true
+                    docker run -d \
+                        --name chatgpt-clone-container \
+                        -p 3000:3000 \
+                        -e OPENAI_API_KEY='${OPENAI_API_KEY}' \
+                        -e PORT='${PORT}' \
+                        chatgpt_clone
                     """
                 }
             }
